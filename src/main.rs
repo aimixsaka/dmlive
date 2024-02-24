@@ -15,6 +15,7 @@ use std::rc::Rc;
 use tokio::runtime::Builder;
 
 #[derive(Parser)]
+#[derive(Debug)]
 #[clap(author, version, about, long_about = None)]
 pub struct Args {
     /// Set the http url
@@ -50,6 +51,7 @@ pub struct Args {
 
 fn main() {
     let args = Args::parse();
+    info!("command line args: {:?}", args);
     let log_level = match args.log_level {
         1 => LevelFilter::Debug,
         2 => LevelFilter::Info,

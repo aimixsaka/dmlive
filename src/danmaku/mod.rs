@@ -394,6 +394,9 @@ impl Danmaku {
     }
 
     pub async fn run_bilivideo(&self, ratio_scale: f64) -> Result<()> {
+        // FIXME: a little hack here to prevent danmaku on --quiet set to true
+        if self.cm.quiet { return Ok(()) }
+
         info!("ratio: {}", &ratio_scale);
         self.reset();
         self.ratio_scale.set(ratio_scale);
@@ -409,6 +412,9 @@ impl Danmaku {
     }
 
     pub async fn run(&self, ratio_scale: f64, _start_pts: u64) -> Result<()> {
+        // FIXME: a little hack here to prevent danmaku on --quiet set to true
+        if self.cm.quiet { return Ok(()) }
+
         self.reset();
         self.ratio_scale.set(ratio_scale);
         let (dtx, drx) = async_channel::unbounded();

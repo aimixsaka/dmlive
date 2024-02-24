@@ -1,4 +1,4 @@
-use std::{fs::DirEntry, time::SystemTime};
+use std::{fs::{DirEntry, self}, time::SystemTime};
 
 use aes::cipher::{block_padding::Pkcs7, BlockDecryptMut, KeyIvInit};
 use log::info;
@@ -162,9 +162,15 @@ async fn get_firefox_cookies(host: &str) -> anyhow::Result<String> {
     if !cookie_path.exists() {
         return Err(anyhow::anyhow!("Firefox Cookies file not found!"));
     }
+
+    // copy cookie file as a new temparorily file
+    // as error `error returned from database: (code: 5) database is locked`
+    let tmp_cookie_path = "/tmp/firefox_cookies.sqlite";
+    fs::copy(cookie_path.into_os_string().into_string().unwrap(), tmp_cookie_path)?;
+
     let pool = SqlitePoolOptions::new()
         .max_connections(1)
-        .connect(&format!("sqlite:{}", cookie_path.to_string_lossy()))
+        .connect(&format!("sqlite:{}", tmp_cookie_path))
         .await?;
     let mut cookies = sqlx::query_as::<_, FirefoxCookie>(
         format!(
